@@ -71,7 +71,7 @@ pip install -r requirements.txt
 
 3. Run the script:
 ```bash
-python gameloop_gui.py
+python Gameloop-Discord-RPC.py
 ```
 
 ## Setup Discord Application
@@ -196,5 +196,6 @@ If you encounter any issues or have questions:
 3. Include your OS version and error messages
 
 ---
+
 
 ⭐ If this project helps you, consider giving it a star!
