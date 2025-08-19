@@ -44,9 +44,11 @@ class GameloopRPC:
             'com.tencent.ig': {'name': 'PUBG Mobile', 'icon': 'pubg_mobile'},
             'com.activision.callofduty.shooter': {'name': 'Call of Duty Mobile', 'icon': 'cod_mobile'},
             'com.garena.game.freefire': {'name': 'Free Fire', 'icon': 'free_fire'},
+            'appmarket': {'name': 'App Market', 'icon': 'app_market'},
         }
         
         self.gameloop_process = "AndroidEmulatorEn.exe"
+        self.appmarket_process = "AppMarket.exe"  
         self.adb_path = None
         self.update_interval = 10
         self.user32 = ctypes.windll.user32
@@ -85,9 +87,14 @@ class GameloopRPC:
         self.gameloop_status = ttk.Label(status_frame, text="Not Running", foreground="red")
         self.gameloop_status.grid(row=1, column=1, sticky="w", padx=(10, 0))
         
-        ttk.Label(status_frame, text="Current Game:").grid(row=2, column=0, sticky="w")
+        
+        ttk.Label(status_frame, text="AppMarket:").grid(row=2, column=0, sticky="w")
+        self.appmarket_status = ttk.Label(status_frame, text="Not Running", foreground="red")
+        self.appmarket_status.grid(row=2, column=1, sticky="w", padx=(10, 0))
+        
+        ttk.Label(status_frame, text="Current Game:").grid(row=3, column=0, sticky="w")
         self.game_status = ttk.Label(status_frame, text="None")
-        self.game_status.grid(row=2, column=1, sticky="w", padx=(10, 0))
+        self.game_status.grid(row=3, column=1, sticky="w", padx=(10, 0))
         
         
         control_frame = ttk.LabelFrame(self.root, text="Controls", padding="10")
@@ -313,6 +320,15 @@ class GameloopRPC:
         except:
             return False
     
+    def is_appmarket_running(self):
+        try:
+            for process in psutil.process_iter(['pid', 'name']):
+                if process.info['name'] == self.appmarket_process:
+                    return True
+            return False
+        except:
+            return False
+    
     def is_gameloop_focused(self):
         try:
             hwnd = self.user32.GetForegroundWindow()
@@ -325,6 +341,23 @@ class GameloopRPC:
             try:
                 process = psutil.Process(pid.value)
                 return process.name() == self.gameloop_process
+            except:
+                return False
+        except:
+            return False
+    
+    def is_appmarket_focused(self):
+        try:
+            hwnd = self.user32.GetForegroundWindow()
+            if hwnd == 0:
+                return False
+            
+            pid = wintypes.DWORD()
+            self.user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+            
+            try:
+                process = psutil.Process(pid.value)
+                return process.name() == self.appmarket_process
             except:
                 return False
         except:
@@ -484,6 +517,7 @@ class GameloopRPC:
             try:
                 current_time = time.time()
                 gameloop_running = self.is_gameloop_running()
+                appmarket_running = self.is_appmarket_running()
                 
                 
                 self.gameloop_status.config(
@@ -491,7 +525,30 @@ class GameloopRPC:
                     foreground="green" if gameloop_running else "red"
                 )
                 
-                if gameloop_running:
+                self.appmarket_status.config(
+                    text="Running" if appmarket_running else "Not Running",
+                    foreground="green" if appmarket_running else "red"
+                )
+                
+                
+                if appmarket_running and self.is_appmarket_focused():
+                    if self.gameloop_start_time is None:
+                        self.gameloop_start_time = current_time
+                    
+                    self.last_focus_time = current_time
+                    game_info = self.get_game_info('appmarket')
+                    current_status_string = "App Market (Active)"
+                    
+                    if self.current_status != current_status_string or current_time - last_update > 30:
+                        self.current_app = 'appmarket'
+                        self.current_status = current_status_string
+                        self.game_status.config(text=game_info['name'])
+                        self.log(f"Using: {current_status_string}")
+                        self.update_presence(game_info)
+                        last_update = current_time
+                
+                
+                elif gameloop_running:
                     if self.gameloop_start_time is None:
                         self.gameloop_start_time = current_time
                         self.last_focus_time = current_time
@@ -525,7 +582,7 @@ class GameloopRPC:
                 
                 else:
                     if self.current_app is not None:
-                        self.log("Gameloop stopped")
+                        self.log("Gameloop and AppMarket stopped")
                         self.current_app = None
                         self.current_status = None
                         self.gameloop_start_time = None
@@ -569,7 +626,7 @@ class GameloopRPC:
         if self.monitor_thread and self.monitor_thread.is_alive():
             self.monitor_thread.join(timeout=2)
         
-        self.start_button.config(state="normal")
+        self.start_button.config(state="disabled")
         self.stop_button.config(state="disabled")
         
         if self.discord_rpc:
@@ -582,6 +639,7 @@ class GameloopRPC:
         
         self.discord_status.config(text="Disconnected", foreground="red")
         self.gameloop_status.config(text="Not Running", foreground="red")
+        self.appmarket_status.config(text="Not Running", foreground="red")
         self.game_status.config(text="None")
         self.current_app = None
         self.current_status = None
