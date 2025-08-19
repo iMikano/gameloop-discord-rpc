@@ -9,7 +9,7 @@ Automatically updates your Discord status when playing mobile games on Gameloop 
 ## Features
 
 - 🎮 **Auto-detection** - Automatically detects when Gameloop is running
-- 📱 **Game Recognition** - Recognizes 20+ popular mobile games and apps
+- 📱 **Game Recognition** - Recognizes 10+ popular mobile games and apps
 - ⏱️ **Play Time Tracking** - Shows how long you've been playing
 - 💤 **Smart Idle Detection** - Detects when you're not actively using Gameloop
 - 🔄 **Real-time Updates** - Updates Discord status in real-time
@@ -199,3 +199,4 @@ If you encounter any issues or have questions:
 
 
 ⭐ If this project helps you, consider giving it a star!
+
