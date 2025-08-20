@@ -3,6 +3,9 @@
 ![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-windows-lightgrey.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Downloads](https://img.shields.io/github/downloads/iMikano/gameloop-discord-rpc/total?color=green&label=downloads)
+![Visitors](https://visitor-badge.laobi.icu/badge?page_id=iMikano.gameloop-discord-rpc&color=green&label=visitors)
+![Open Issues](https://img.shields.io/github/issues/iMikano/gameloop-discord-rpc?color=yellow&label=open%20issues)
 
 Automatically updates your Discord status when playing mobile games on Gameloop Android Emulator. Shows the current game, play time, and whether you're actively playing or idle.
 
@@ -199,4 +202,5 @@ If you encounter any issues or have questions:
 
 
 ⭐ If this project helps you, consider giving it a star!
+
 
